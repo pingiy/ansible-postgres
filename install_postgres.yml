@@ -1,0 +1,78 @@
+--- 
+- name: Install and configure Postgresql
+  hosts: ub1
+  gather_facts: yes
+  remote_user: root
+  vars_files: ~/ansible/vars/main.yml
+
+  tasks:
+    - name: Install postgresql
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        name: postgresql
+        state: present
+
+    - name: Enable service postgresql
+      service:
+        name: postgresql
+        enabled: yes
+
+    - name: Start service postgresql
+      service: 
+        name: postgresql
+        state: started
+
+- name: Create new user, db and grant user privileges in postgres.
+  hosts: ub1
+  gather_facts: no
+  become: yes
+  become_user: postgres
+  remote_user: root
+  become_method: su
+  vars_files: ~/ansible/vars/main.yml
+
+  tasks:
+    - name: create new user && create new db && grant user privileges && list users && list databases
+      shell:
+       psql -c "CREATE USER {{postgres_db_user}} WITH PASSWORD '{{postgres_db_pass}}'" &&
+        psql -c "CREATE DATABASE {{postgres_db_name}}" &&
+         psql -c "GRANT ALL PRIVILEGES ON DATABASE {{postgres_db_name}} to {{postgres_db_user}}" &&
+          psql -c "\du" &&
+           psql -l
+
+- name: Change postgres port auto
+  hosts: ub1
+  gather_facts: no
+  become: yes
+  become_user: postgres
+  remote_user: root
+  become_method: su
+  vars_files: ~/ansible/vars/main.yml
+
+  tasks:
+    - name: postgresql.conf path to var
+      shell:
+       psql -c "SHOW config_file"|grep postgresql.conf|sed 's/ //'
+      register: postgres_config_path
+    - debug:
+        var: postgres_config_path.stdout
+
+- name: change postgres connection port from 5432 to 6432.
+  hosts: ub1
+  gather_facts: no
+  remote_user: root
+  vars_files: ~/ansible/vars/main.yml
+
+  tasks:
+    - name: replace port = 5432 to port = 6432
+      replace:
+        path: '{{postgres_config_path.stdout}}'
+        regexp: 'port = {{postgres_default_db_port}}'
+        replace: 'port = {{postgres_new_db_port}}'
+    
+    - name: Restart service postgresql
+      service: 
+        name: postgresql
+        state: restarted
+

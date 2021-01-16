@@ -1,0 +1,23 @@
+---
+# Variables list
+ansible_python_interpreter: /usr/bin/python3
+
+mclink: http://archive.ubuntu.com/ubuntu/pool/universe/m/mc/mc_4.8.25-1_amd64.deb
+
+# Postgres vars
+postgres_download_package: postgresql-11_11.10-1.pgdg20.10+1_amd64.deb
+postgres_download_link: 'https://apt.postgresql.org/pub/repos/apt/pool/main/p/postgresql-11/postgresql-11_11.10-1.pgdg20.10+1_amd64.deb'
+postgres_default_db_port: 5432
+postgres_new_db_port: 6432
+postgres_db_name: mydatabase
+postgres_db_user: myusername
+postgres_db_pass: mypassword
+postgres_db_hosts: localhost, 192.168.43.68/24, 192.168.20.253/24
+
+postgres_db_host1: 192.168.43.68/24
+postgres_db_host2: 192.168.10.250/24
+postgres_db_host3: 192.168.20.253/24
+
+# Tomcat vars
+tomcat_var1: 
+tomcat_var2: 

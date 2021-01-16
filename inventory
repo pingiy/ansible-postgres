@@ -1,0 +1,5 @@
+[SERVERS_KVM]
+bsd ansible_host=192.168.1.178
+[HOSTS_KVM]
+ub1 ansible_host=192.168.10.250
+ub2 ansible_host=192.168.20.253
