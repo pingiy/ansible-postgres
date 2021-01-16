@@ -51,19 +51,19 @@
   vars_files: ~/ansible/vars/main.yml
 
   tasks:
-    - name: postgresql.conf path to var
+    - name: Add postgresql.conf path to var
       shell:
        psql -c "SHOW config_file"|grep postgresql.conf|sed 's/ //'
       register: postgres_config_path
 
-- name: change postgres connection port from 5432 to 6432.
+- name: Change postgres connection port from 5432 to 6432.
   hosts: ub1
   gather_facts: no
   remote_user: root
   vars_files: ~/ansible/vars/main.yml
 
   tasks:
-    - name: replace port = 5432 to port = 6432
+    - name: Replace port = 5432 to port = 6432
       replace:
         path: '{{postgres_config_path.stdout}}'
         regexp: 'port = {{postgres_default_db_port}}'
