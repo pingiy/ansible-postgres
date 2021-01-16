@@ -55,8 +55,6 @@
       shell:
        psql -c "SHOW config_file"|grep postgresql.conf|sed 's/ //'
       register: postgres_config_path
-    - debug:
-        var: postgres_config_path.stdout
 
 - name: change postgres connection port from 5432 to 6432.
   hosts: ub1
