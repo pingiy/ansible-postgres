@@ -4,8 +4,12 @@ ansible_python_interpreter: /usr/bin/python3
 
 # Postgres vars
 postgres_default_db_port: 5432
-postgres_new_db_port: 6432
+postgres_db_port: 6432
 postgres_db_name: mydatabase
 postgres_db_user: myusername
 postgres_db_pass: mypassword
 
+# Tomcat vars
+
+tomcat_local_files: ~/ansible/roles/tomcat/files
+tomcat_config_path: /opt/tomcat/conf/
