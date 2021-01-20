@@ -1,0 +1,90 @@
+--- 
+- name: Install and configure Tomcat
+  hosts: ub2
+  gather_facts: yes
+  remote_user: root
+  vars_files: ~/ansible/vars/main.yml
+
+  tasks:
+    - name: Install Java8, download and install Tomcat8
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        name: openjdk-8-jdk
+        state: present
+    
+    - name: Unarchive Tomcat8 from local to remote dir.
+      unarchive:
+        src: '{{ tomcat_local_files }}/apache-tomcat-8.5.61.tar.gz'
+        dest: /opt
+
+    - name: Rename Tomcat dir
+      command: mv /opt/apache-tomcat-8.5.61 /opt/tomcat
+    
+    - name: Add or check user 'tomcat' with false shell and /opt/tomcat homedir
+      user:
+        name: tomcat
+        home: /opt/tomcat
+        shell: /bin/false
+
+    - name: Change ownership /opt/tomcat to tomcat user
+      file:
+        path: /opt/tomcat
+        state: directory
+        recurse: yes
+        owner: tomcat
+        group: tomcat
+
+    - name: Copy tomcat.service to remote
+      copy:
+        src: '{{ tomcat_local_files }}/tomcat.service'
+        dest: /etc/systemd/system/tomcat.service
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Add path of Java home path to var
+      shell: update-java-alternatives -l|grep -oE '[^ ]+$'
+      register: java_home_path 
+    - debug:
+        var: java_home_path.stdout
+    
+    - name: Replace Java home path in tomcat.service
+      replace:
+        path: /etc/systemd/system/tomcat.service
+        regexp: 'Environment="JAVA_HOME={{ java_old_path }}"'
+        replace: 'Environment="JAVA_HOME={{ java_home_path.stdout }}"'
+
+    - name: Copy JDBC java driver to remote
+      copy:
+        src: '{{ tomcat_local_files }}/postgresql-42.2.18.jar'
+        dest: /opt/tomcat/lib/postgresql-42.2.18.jar
+        owner: root
+        group: root
+        mode: 0640
+
+    - name: Copy server.xml to remote
+      copy:
+        src: '{{ tomcat_local_files }}/server.xml'
+        dest: /opt/tomcat/conf/server.xml
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: Copy context.xml to remote
+      copy:
+        src: '{{ tomcat_local_files }}/context.xml'
+        dest: /opt/tomcat/conf/context.xml
+        owner: root
+        group: root
+        mode: 0600
+          
+    - name: Enable service tomcat
+      service:
+        name: tomcat
+        enabled: yes
+    
+    - name: Start service tomcat
+      service: 
+        name: tomcat
+        state: started
