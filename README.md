@@ -1,2 +1,2 @@
 # ansible
-install and configure PostgreSQL and Tomcat on Ubuntu server via ansible 2.9
+Ansible script for PostgreSQL and Tomcat installation and configuration on Ubuntu server via ansible 2.9
