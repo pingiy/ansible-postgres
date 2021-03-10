@@ -33,7 +33,7 @@
   vars_files: ~/ansible/vars/main.yml
 
   tasks:
-    - name: create new user && create new db && grant user privileges && list users && list databases
+    - name: create new user, create new db, grant user privileges
       shell:
        psql -c "CREATE USER {{postgres_db_user}} WITH PASSWORD '{{postgres_db_pass}}'" &&
         psql -c "CREATE DATABASE {{postgres_db_name}}" &&
